@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block title %}
+Dashboard
+{% endblock title %}
+
+{% block content %}
+
+<div class="mb-10 text-center">
+  <h1 class="text-4xl font-extrabold text-green-800">Dashboard</h1>
+  <p class="text-green-600 mt-2">Everything you need, at a glance</p>
+</div>
+
+{% if user.is_authenticated %}
+
+{% if user.user_type == 'JOBSEEKER' %}
+
+<div class="bg-green-50 border border-green-200 rounded-xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+  <div>
+    <h2 class="text-2xl font-bold text-green-800">
+      Welcome, {{ user.first_name|default:user.username }}
+    </h2>
+    <p class="text-gray-700 mt-1">
+      Skills:
+      <span class="font-semibold text-green-700">
+        {{ user.jobseekerprofile.skills|default:"Not set" }}
+      </span>
+    </p>
+  </div>
+  <a href="/accounts/profile/" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold">
+    Edit Profile
+  </a>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+  <div class="bg-white border border-green-200 rounded-xl p-6 shadow">
+    <p class="text-green-700 font-semibold mb-2">Applications</p>
+    <p class="text-4xl font-extrabold text-green-800">{{ applications|length }}</p>
+    <p class="text-sm text-gray-500 mt-2">Total applied jobs</p>
+  </div>
+  <div class="bg-white border border-green-200 rounded-xl p-6 shadow md:col-span-2">
+    <p class="text-green-700 font-semibold mb-2">Your Skills</p>
+    <p class="text-xl font-bold text-gray-800 truncate">
+      {{ user.jobseekerprofile.skills|default:"—" }}
+    </p>
+  </div>
+</div>
+
+{% if matched %}
+<div class="mb-14">
+  <h3 class="text-3xl font-bold text-green-800 mb-6">Recommended Jobs</h3>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {% for job in matched %}
+    <div class="bg-white border border-green-200 rounded-xl shadow hover:shadow-lg transition">
+      <div class="p-6">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h4 class="text-xl font-bold text-green-800">{{ job.title }}</h4>
+            <p class="text-sm text-gray-600">
+              {{ job.recruiter.recruiterprofile.company_name|default:"Company" }}
+            </p>
+          </div>
+          {% if job.company_logo %}
+          <img src="{{ job.company_logo.url }}" class="h-12 w-12 rounded-full object-cover">
+          {% endif %}
+        </div>
+
+        <div class="flex items-center gap-3 mb-4">
+          <span class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full">
+            Match
+          </span>
+          <span class="text-sm text-gray-500">{{ job.openings }} openings</span>
+        </div>
+
+        <p class="text-gray-700 mb-4 line-clamp-2">
+          {{ job.description }}
+        </p>
+
+        <a href="{% url 'job_detail' job.id %}" class="block text-center bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 font-semibold">
+          View Job
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if applications %}
+<div class="mb-16">
+  <h3 class="text-3xl font-bold text-green-800 mb-6">My Applications</h3>
+  <div class="space-y-4">
+    {% for application in applications %}
+    <div class="bg-white border border-green-200 rounded-xl p-5 flex flex-col md:flex-row justify-between gap-4 shadow">
+      <div>
+        <p class="text-lg font-bold text-green-800">{{ application.job.title }}</p>
+        <p class="text-sm text-gray-600">
+          {{ application.job.recruiter.recruiterprofile.company_name|default:"Company" }}
+        </p>
+        <p class="text-sm text-gray-500 mt-1">
+          Applied on {{ application.applied_on|date:"M d, Y" }}
+        </p>
+      </div>
+      <a href="{% url 'job_detail' application.job.id %}" class="self-start md:self-center bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 font-semibold">
+        View
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% elif user.user_type == 'RECRUITER' %}
+
+<div class="bg-green-50 border border-green-200 rounded-xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
+  <div>
+    <h2 class="text-2xl font-bold text-green-800">
+      {{ user.recruiterprofile.company_name|default:"Your Company" }}
+    </h2>
+    <p class="text-gray-600 mt-1">Recruiter Dashboard</p>
+  </div>
+  <a href="{% url 'job_create' %}" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold">
+    Post New Job
+  </a>
+</div>
+
+{% if matched_candidates %}
+<div class="mb-14">
+  <h3 class="text-3xl font-bold text-green-800 mb-6">Matched Candidates</h3>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for job, candidates in matched_candidates.items %}
+    <div class="bg-white border border-green-200 rounded-xl shadow">
+      <div class="bg-green-100 p-4 rounded-t-xl">
+        <p class="font-bold text-green-900">{{ job.title }}</p>
+        <p class="text-sm text-green-700 truncate">{{ job.skills }}</p>
+      </div>
+      <div class="p-4 space-y-4">
+        {% for candidate in candidates %}
+        <div class="flex gap-3 items-start">
+          <div class="h-10 w-10 rounded-full bg-green-200 flex items-center justify-center font-bold text-green-800">
+            {{ candidate.user.first_name|first|default:candidate.user.username|first|upper }}
+          </div>
+          <div>
+            <p class="font-semibold text-gray-800">
+              {{ candidate.user.first_name|default:candidate.user.username }}
+            </p>
+            <p class="text-sm text-gray-600">{{ candidate.skills }}</p>
+            {% if candidate.resume %}
+            <a href="{{ candidate.resume.url }}" target="_blank" class="inline-block mt-1 text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700">
+              Resume
+            </a>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if your_jobs %}
+<div class="mb-16">
+  <h3 class="text-3xl font-bold text-green-800 mb-6">Your Job Posts</h3>
+  <div class="space-y-4">
+    {% for job in your_jobs %}
+    <div class="bg-white border border-green-200 rounded-xl p-5 shadow flex flex-col md:flex-row justify-between gap-4">
+      <div>
+        <p class="font-bold text-green-800 text-lg">{{ job.title }}</p>
+        <p class="text-sm text-gray-600">
+          {{ job.openings }} openings · {{ job.jobapplication_set.count }} applications
+        </p>
+      </div>
+      <div class="flex gap-4 items-center">
+        <a href="{% url 'job_edit' job.id %}" class="text-green-700 font-semibold hover:underline">Edit</a>
+        <a href="{% url 'job_delete' job.id %}" class="text-red-600 font-semibold hover:underline">Delete</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% else %}
+<div class="bg-green-50 border border-green-200 p-10 rounded-xl text-center">
+  <p class="text-gray-600 mb-6">You haven’t posted any jobs yet.</p>
+  <a href="{% url 'job_create' %}" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 font-semibold">
+    Create Job
+  </a>
+</div>
+{% endif %}
+
+{% endif %}
+
+{% else %}
+
+<div class="bg-green-50 border border-green-200 p-12 rounded-xl text-center">
+  <h2 class="text-3xl font-bold text-green-800 mb-4">Welcome to JobPortal</h2>
+  <p class="text-gray-600 mb-8">Login or register to access your dashboard</p>
+  <div class="flex justify-center gap-6">
+    <a href="{% url 'login' %}" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 font-semibold">
+      Login
+    </a>
+    <a href="{% url 'register' %}" class="bg-green-700 text-white px-8 py-3 rounded-lg hover:bg-green-800 font-semibold">
+      Register
+    </a>
+  </div>
+</div>
+
+{% endif %}
+
+{% endblock %}

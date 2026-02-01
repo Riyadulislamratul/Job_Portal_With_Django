@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="flex justify-center py-8">
+  <div class="bg-white p-8 rounded shadow-lg max-w-md w-full">
+    <h1 class="text-2xl font-bold mb-6 text-center">Login to JobPortal</h1>
+    
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      
+      <div>
+        <label class="block font-semibold mb-2">Username</label>
+        <input name="username" class="w-full border p-3 rounded" placeholder="Enter your username" required autofocus/>
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2">Password</label>
+        <input name="password" type="password" class="w-full border p-3 rounded" placeholder="Enter your password" required/>
+      </div>
+
+      <button type="submit" class="w-full bg-blue-600 text-white px-4 py-3 rounded hover:bg-blue-700 font-medium">Login</button>
+    </form>
+
+    <p class="text-center text-gray-600 mt-6">
+      Don't have an account? <a href="{% url 'register' %}" class="text-blue-600 hover:underline font-semibold">Register here</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">My Profile</h1>
+
+<div class="grid grid-cols-3 gap-6 mb-8">
+  <!-- User Info Card -->
+  <div class="bg-white p-6 rounded shadow-lg">
+    <h3 class="text-lg font-bold mb-4 text-blue-600">Account Information</h3>
+    <div class="space-y-3">
+      <div>
+        <p class="text-sm text-gray-600">Username</p>
+        <p class="font-semibold">{{ user.username }}</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600">Display Name</p>
+        <p class="font-semibold">{{ user.first_name|default:"(Not set)" }}</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600">Email</p>
+        <p class="font-semibold">{{ user.email }}</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600">Role</p>
+        <p class="font-semibold inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded">
+          {% if user.user_type == 'JOBSEEKER' %}
+            Job Seeker
+          {% else %}
+            Recruiter
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role-Specific Info -->
+  <div class="bg-white p-6 rounded shadow-lg col-span-2">
+    <h3 class="text-lg font-bold mb-4 text-blue-600">
+      {% if user.user_type == 'JOBSEEKER' %}
+        Skills & Resume
+      {% else %}
+        Company Information
+      {% endif %}
+    </h3>
+    
+    {% if user.user_type == 'JOBSEEKER' %}
+      <div class="space-y-3">
+        <div>
+          <p class="text-sm text-gray-600 font-semibold">Current Skills</p>
+          <p class="text-gray-700">{{ profile.skills|default:"(Not set)" }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600 font-semibold">Resume</p>
+          {% if profile.resume %}
+            <a href="{{ profile.resume.url }}" target="_blank" class="text-blue-600 hover:underline">Download Resume</a>
+          {% else %}
+            <p class="text-gray-600 text-sm">(No resume uploaded)</p>
+          {% endif %}
+        </div>
+      </div>
+    {% else %}
+      <div class="space-y-3">
+        <div>
+          <p class="text-sm text-gray-600 font-semibold">Company Name</p>
+          <p class="text-gray-700">{{ profile.company_name|default:"(Not set)" }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600 font-semibold">Company Description</p>
+          <p class="text-gray-700">{{ profile.company_description|default:"(Not set)" }}</p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Update Form -->
+<div class="bg-white p-6 rounded shadow-lg max-w-2xl">
+  <h2 class="text-xl font-bold mb-6">Update Profile</h2>
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+    
+    {% if user.user_type == 'JOBSEEKER' %}
+      <!-- Jobseeker Update Form -->
+      <div>
+        <label class="block font-semibold mb-2">Skills (comma-separated) *</label>
+        <textarea name="skills" class="w-full border p-3 rounded h-24" placeholder="e.g., Python, Django, REST APIs, PostgreSQL" required>{{ profile.skills }}</textarea>
+        <p class="text-sm text-gray-600 mt-1">List your technical skills separated by commas</p>
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2">Resume (PDF/DOC)</label>
+        <input type="file" name="resume" accept=".pdf,.doc,.docx" class="w-full border p-3 rounded"/>
+        {% if profile.resume %}
+          <p class="text-sm text-gray-600 mt-2">
+            Current: <a href="{{ profile.resume.url }}" target="_blank" class="text-blue-600 hover:underline">{{ profile.resume.name }}</a>
+          </p>
+        {% endif %}
+      </div>
+    {% else %}
+      <!-- Recruiter Update Form -->
+      <div>
+        <label class="block font-semibold mb-2">Company Name *</label>
+        <input name="company_name" class="w-full border p-3 rounded" value="{{ profile.company_name }}" placeholder="Your company name" required/>
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2">Company Description</label>
+        <textarea name="company_description" class="w-full border p-3 rounded h-24" placeholder="Tell jobseekers about your company...">{{ profile.company_description }}</textarea>
+      </div>
+    {% endif %}
+
+    <div class="flex gap-3">
+      <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 font-medium">Save Changes</button>
+      <a href="{% url 'dashboard' %}" class="bg-gray-400 text-white px-6 py-3 rounded hover:bg-gray-500 font-medium">Back to Dashboard</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

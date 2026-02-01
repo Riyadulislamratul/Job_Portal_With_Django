@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="flex justify-center py-8">
+  <div class="bg-white p-8 rounded shadow-lg max-w-md w-full">
+    <h1 class="text-2xl font-bold mb-6 text-center">Create Your Account</h1>
+    
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      
+      <div>
+        <label class="block font-semibold mb-2">Username *</label>
+        <input name="username" class="w-full border p-3 rounded" placeholder="Choose a username" required/>
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2">Display Name</label>
+        <input name="display_name" class="w-full border p-3 rounded" placeholder="Your full name"/>
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2">Email *</label>
+        <input name="email" type="email" class="w-full border p-3 rounded" placeholder="your@email.com" required/>
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2">Password *</label>
+        <input name="password" type="password" class="w-full border p-3 rounded" placeholder="Create a strong password" required/>
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2">Confirm Password *</label>
+        <input name="password2" type="password" class="w-full border p-3 rounded" placeholder="Re-enter your password" required/>
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2">Role *</label>
+        <select name="user_type" class="w-full border p-3 rounded" required>
+          <option value="">Select your role</option>
+          <option value="RECRUITER">Recruiter</option>
+          <option value="JOBSEEKER">Job Seeker</option>
+        </select>
+      </div>
+
+      <button type="submit" class="w-full bg-green-600 text-white px-4 py-3 rounded hover:bg-green-700 font-medium">Create Account</button>
+    </form>
+
+    <p class="text-center text-gray-600 mt-6">
+      Already have an account? <a href="{% url 'login' %}" class="text-blue-600 hover:underline font-semibold">Login here</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

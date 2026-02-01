@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home
+{% endblock title %}
+
+
+
+{% block content %}
+<div class="mb-10 text-center">
+  <h1 class="text-5xl font-extrabold text-green-800 mb-3">Find Your Next Opportunity</h1>
+  <p class="text-green-600 text-lg">Jobs curated to grow your career</p>
+</div>
+
+<div class="bg-green-50 p-6 rounded-xl shadow mb-10">
+  <form method="get" class="flex gap-3">
+    <input type="text" name="q" placeholder="Search by role, skill, or keyword..." class="flex-1 border border-green-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" value="{{ query }}">
+    <button type="submit" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 font-semibold">
+      Search
+    </button>
+  </form>
+</div>
+
+{% if show_skill_match and matched_jobs %}
+<div class="mb-14">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-3xl font-bold text-green-800 flex items-center gap-2">
+      Recommended For You
+    </h2>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    {% for job in matched_jobs %}
+    <div class="bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden border border-green-200">
+      <div class="p-6">
+        <div class="flex justify-between items-start mb-3">
+          <h3 class="text-2xl font-bold text-green-700">{{ job.title }}</h3>
+          {% if job.company_logo %}
+          <img src="{{ job.company_logo.url }}" class="h-12 w-12 rounded-full object-cover">
+          {% endif %}
+        </div>
+
+        <p class="text-sm text-green-600 font-semibold mb-3">
+          {% if job.recruiter.recruiterprofile %}
+            {{ job.recruiter.recruiterprofile.company_name }}
+          {% else %}
+            Company
+          {% endif %}
+        </p>
+
+        <div class="flex flex-wrap gap-4 text-sm mb-4">
+          <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full">Openings: {{ job.openings }}</span>
+          <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full">{{ job.skills }}</span>
+        </div>
+
+        <p class="text-gray-700 mb-5">{{ job.description|truncatechars:180 }}</p>
+
+        <a href="{% url 'job_detail' job.id %}" class="block text-center bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 font-semibold">
+          View & Apply
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div>
+  <h2 class="text-3xl font-bold text-green-800 mb-6">All Open Positions</h2>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    {% for job in jobs %}
+    <div class="bg-white rounded-xl shadow hover:shadow-xl transition border border-green-200">
+      <div class="p-6">
+        <div class="flex justify-between items-start mb-3">
+          <h3 class="text-2xl font-bold text-green-700">{{ job.title }}</h3>
+          {% if job.company_logo %}
+          <img src="{{ job.company_logo.url }}" class="h-12 w-12 rounded-full object-cover">
+          {% endif %}
+        </div>
+
+        <p class="text-sm text-green-600 font-semibold mb-3">
+          {% if job.recruiter.recruiterprofile %}
+            {{ job.recruiter.recruiterprofile.company_name }}
+          {% else %}
+            Company
+          {% endif %}
+        </p>
+
+        <div class="flex flex-wrap gap-4 text-sm mb-4">
+          <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full">Openings: {{ job.openings }}</span>
+          <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full">{{ job.skills }}</span>
+        </div>
+
+        <p class="text-gray-700 mb-5">{{ job.description|truncatechars:180 }}</p>
+
+        <a href="{% url 'job_detail' job.id %}" class="block text-center bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 font-semibold">
+          View Details
+        </a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full bg-green-50 p-10 rounded-xl text-center">
+      <p class="text-green-700 text-lg">
+        {% if query %}
+          No results found for "{{ query }}"
+        {% else %}
+          No jobs available right now
+        {% endif %}
+      </p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% if not user.is_authenticated %}
+<div class="mt-16 bg-green-700 rounded-xl p-10 text-center text-white">
+  <h3 class="text-3xl font-bold mb-3">Start Your Career Journey</h3>
+  <p class="text-green-100 mb-6">Create an account to apply and track job applications</p>
+  <a href="{% url 'register' %}" class="inline-block bg-white text-green-700 px-8 py-3 rounded-lg font-bold hover:bg-green-100">
+    Create Account
+  </a>
+</div>
+{% endif %}
+{% endblock %}
