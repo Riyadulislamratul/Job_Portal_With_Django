@@ -1,117 +1,180 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="text-3xl font-bold mb-6">My Profile</h1>
-
-<div class="grid grid-cols-3 gap-6 mb-8">
-  <!-- User Info Card -->
-  <div class="bg-white p-6 rounded shadow-lg">
-    <h3 class="text-lg font-bold mb-4 text-blue-600">Account Information</h3>
-    <div class="space-y-3">
-      <div>
-        <p class="text-sm text-gray-600">Username</p>
-        <p class="font-semibold">{{ user.username }}</p>
-      </div>
-      <div>
-        <p class="text-sm text-gray-600">Display Name</p>
-        <p class="font-semibold">{{ user.first_name|default:"(Not set)" }}</p>
-      </div>
-      <div>
-        <p class="text-sm text-gray-600">Email</p>
-        <p class="font-semibold">{{ user.email }}</p>
-      </div>
-      <div>
-        <p class="text-sm text-gray-600">Role</p>
-        <p class="font-semibold inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded">
-          {% if user.user_type == 'JOBSEEKER' %}
-            Job Seeker
-          {% else %}
-            Recruiter
-          {% endif %}
-        </p>
-      </div>
+<div class="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-600 rounded-3xl py-8 px-4">
+  <div class="max-w-5xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold bg-gradient-to-r from-white to-indigo-200 bg-clip-text text-transparent">My Profile</h1>
     </div>
-  </div>
 
-  <!-- Role-Specific Info -->
-  <div class="bg-white p-6 rounded shadow-lg col-span-2">
-    <h3 class="text-lg font-bold mb-4 text-blue-600">
-      {% if user.user_type == 'JOBSEEKER' %}
-        Skills & Resume
-      {% else %}
-        Company Information
-      {% endif %}
-    </h3>
-    
-    {% if user.user_type == 'JOBSEEKER' %}
-      <div class="space-y-3">
-        <div>
-          <p class="text-sm text-gray-600 font-semibold">Current Skills</p>
-          <p class="text-gray-700">{{ profile.skills|default:"(Not set)" }}</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <!-- User Info Card -->
+      <div class="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-white/50">
+        <div class="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-full mb-4 mx-auto shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
         </div>
-        <div>
-          <p class="text-sm text-gray-600 font-semibold">Resume</p>
-          {% if profile.resume %}
-            <a href="{{ profile.resume.url }}" target="_blank" class="text-blue-600 hover:underline">Download Resume</a>
-          {% else %}
-            <p class="text-gray-600 text-sm">(No resume uploaded)</p>
-          {% endif %}
+        <h3 class="text-lg font-bold mb-4 text-center text-indigo-600">Account Information</h3>
+        <div class="space-y-3">
+          <div>
+            <p class="text-sm text-black-500">Username</p>
+            <p class="font-semibold text-black-800">{{ user.username }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-black-500">Display Name</p>
+            <p class="font-semibold text-black-800">{{ user.first_name|default:"(Not set)" }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-black-500">Email</p>
+            <p class="font-semibold text-black-800">{{ user.email }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-black-500">Role</p>
+            <p class="font-semibold inline-block bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-800 px-3 py-1 rounded-full">
+              {% if user.user_type == 'JOBSEEKER' %}
+                Job Seeker
+              {% else %}
+                Recruiter
+              {% endif %}
+            </p>
+          </div>
         </div>
       </div>
-    {% else %}
-      <div class="space-y-3">
-        <div>
-          <p class="text-sm text-gray-600 font-semibold">Company Name</p>
-          <p class="text-gray-700">{{ profile.company_name|default:"(Not set)" }}</p>
-        </div>
-        <div>
-          <p class="text-sm text-gray-600 font-semibold">Company Description</p>
-          <p class="text-gray-700">{{ profile.company_description|default:"(Not set)" }}</p>
-        </div>
-      </div>
-    {% endif %}
-  </div>
-</div>
 
-<!-- Update Form -->
-<div class="bg-white p-6 rounded shadow-lg max-w-2xl">
-  <h2 class="text-xl font-bold mb-6">Update Profile</h2>
-  <form method="post" enctype="multipart/form-data" class="space-y-4">
-    {% csrf_token %}
-    
-    {% if user.user_type == 'JOBSEEKER' %}
-      <!-- Jobseeker Update Form -->
-      <div>
-        <label class="block font-semibold mb-2">Skills (comma-separated) *</label>
-        <textarea name="skills" class="w-full border p-3 rounded h-24" placeholder="e.g., Python, Django, REST APIs, PostgreSQL" required>{{ profile.skills }}</textarea>
-        <p class="text-sm text-gray-600 mt-1">List your technical skills separated by commas</p>
-      </div>
-
-      <div>
-        <label class="block font-semibold mb-2">Resume (PDF/DOC)</label>
-        <input type="file" name="resume" accept=".pdf,.doc,.docx" class="w-full border p-3 rounded"/>
-        {% if profile.resume %}
-          <p class="text-sm text-gray-600 mt-2">
-            Current: <a href="{{ profile.resume.url }}" target="_blank" class="text-blue-600 hover:underline">{{ profile.resume.name }}</a>
-          </p>
+      <!-- Role-Specific Info -->
+      <div class="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-white/50 md:col-span-2">
+        <div class="flex items-center mb-4">
+          <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg mr-3 shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {% if user.user_type == 'JOBSEEKER' %}
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              {% else %}
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              {% endif %}
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-indigo-600">
+            {% if user.user_type == 'JOBSEEKER' %}
+              Skills & Resume
+            {% else %}
+              Company Information
+            {% endif %}
+          </h3>
+        </div>
+        
+        {% if user.user_type == 'JOBSEEKER' %}
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm text-black-500 font-semibold mb-1">Current Skills</p>
+              <p class="text-black-700 bg-gray-50 p-3 rounded-lg">{{ profile.skills|default:"(Not set)" }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-black-500 font-semibold mb-1">Resume</p>
+              {% if profile.resume %}
+                <a href="{{ profile.resume.url }}" target="_blank" class="inline-flex items-center text-indigo-600 hover:text-indigo-700 font-semibold hover:underline">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Download Resume
+                </a>
+              {% else %}
+                <p class="text-black-500 text-sm">(No resume uploaded)</p>
+              {% endif %}
+            </div>
+          </div>
+        {% else %}
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm text-black-500 font-semibold mb-1">Company Name</p>
+              <p class="text-black-700 bg-gray-50 p-3 rounded-lg">{{ profile.company_name|default:"(Not set)" }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-black-500 font-semibold mb-1">Company Description</p>
+              <p class="text-black-700 bg-gray-50 p-3 rounded-lg">{{ profile.company_description|default:"(Not set)" }}</p>
+            </div>
+          </div>
         {% endif %}
       </div>
-    {% else %}
-      <!-- Recruiter Update Form -->
-      <div>
-        <label class="block font-semibold mb-2">Company Name *</label>
-        <input name="company_name" class="w-full border p-3 rounded" value="{{ profile.company_name }}" placeholder="Your company name" required/>
-      </div>
-
-      <div>
-        <label class="block font-semibold mb-2">Company Description</label>
-        <textarea name="company_description" class="w-full border p-3 rounded h-24" placeholder="Tell jobseekers about your company...">{{ profile.company_description }}</textarea>
-      </div>
-    {% endif %}
-
-    <div class="flex gap-3">
-      <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 font-medium">Save Changes</button>
-      <a href="{% url 'dashboard' %}" class="bg-gray-400 text-white px-6 py-3 rounded hover:bg-gray-500 font-medium">Back to Dashboard</a>
     </div>
-  </form>
+
+    <!-- Update Form -->
+    <div class="bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-white/50">
+      <div class="flex items-center mb-6">
+        <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg mr-3 shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        </div>
+        <h2 class="text-xl font-bold text-indigo-600">Update Profile</h2>
+      </div>
+      <form method="post" enctype="multipart/form-data" class="space-y-5">
+        {% csrf_token %}
+        
+        {% if user.user_type == 'JOBSEEKER' %}
+          <!-- Jobseeker Update Form -->
+          <div>
+            <label class="block font-semibold mb-2 text-black-700">Skills (comma-separated)</label>
+            <textarea name="skills" class="w-full border-2 border-gray-200 p-4 rounded-xl focus:outline-none focus:border-indigo-400 focus:bg-white transition-all h-28" placeholder="e.g., Python, Django, REST APIs, PostgreSQL" required>{{ profile.skills }}</textarea>
+            <p class="text-sm text-black-500 mt-2">List your technical skills separated by commas</p>
+          </div>
+
+          <div>
+            <label class="block font-semibold mb-2 text-black-700">Resume (PDF/DOC)</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-black-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+              </span>
+              <input type="file" name="resume" accept=".pdf,.doc,.docx" class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-indigo-400 transition-all"/>
+            </div>
+            {% if profile.resume %}
+              <p class="text-sm text-black-500 mt-2">
+                Current: <a href="{{ profile.resume.url }}" target="_blank" class="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline">{{ profile.resume.name }}</a>
+              </p>
+            {% endif %}
+          </div>
+        {% else %}
+          <!-- Recruiter Update Form -->
+          <div>
+            <label class="block font-semibold mb-2 text-black-700">Company Name</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-black-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </span>
+              <input name="company_name" class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-indigo-400 focus:bg-white transition-all" value="{{ profile.company_name }}" placeholder="Your company name" required/>
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold mb-2 text-black-700">Company Description</label>
+            <textarea name="company_description" class="w-full border-2 border-gray-200 p-4 rounded-xl focus:outline-none focus:border-indigo-400 focus:bg-white transition-all h-28" placeholder="Tell jobseekers about your company...">{{ profile.company_description }}</textarea>
+          </div>
+        {% endif %}
+
+        <div class="flex gap-4 pt-4">
+          <button type="submit" class="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:shadow-xl transition-all transform hover:-translate-y-1 bg-[length:200%_100%] animate-gradient">
+            Save Changes
+          </button>
+          <a href="{% url 'dashboard' %}" class="bg-gray-400 text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-500 transition-all">Back to Dashboard</a>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
+
+<style>
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-gradient {
+  background-size: 200% 100%;
+  animation: gradient 3s ease infinite;
+}
+</style>
 {% endblock %}
